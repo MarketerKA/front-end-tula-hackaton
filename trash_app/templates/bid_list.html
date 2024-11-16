@@ -1,0 +1,9 @@
+<h1>Bids</h1>
+<ul>
+    {% for bid in bids %}
+    <li>
+        <a href="{% url 'bid_detail' bid.id %}">{{ bid.type }} - {{ bid.status }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'create_bid' %}">Create New Bid</a>

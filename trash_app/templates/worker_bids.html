@@ -1,0 +1,9 @@
+<h1>Bids for {{ worker.user.username }}</h1>
+<ul>
+    {% for bid in bids %}
+    <li>
+        <a href="{% url 'bid_detail' bid.id %}">{{ bid.type }} - {{ bid.status }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{% url 'worker_list' %}">Back to Workers</a>

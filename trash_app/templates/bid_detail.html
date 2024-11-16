@@ -1,0 +1,12 @@
+<h1>Bid Details</h1>
+<p>Type: {{ bid.type }}</p>
+<p>Address: {{ bid.address }}</p>
+<p>Status: {{ bid.status }}</p>
+<p>Description: {{ bid.description }}</p>
+<img src="{{ bid.image.url }}" alt="Image" style="max-width: 400px;"/>
+<p>Created At: {{ bid.created_at }}</p>
+<a href="{% url 'update_bid' bid.id %}">Edit</a>
+<form method="post" action="{% url 'delete_bid' bid.id %}">
+    {% csrf_token %}
+    <button type="submit">Delete</button>
+</form>
