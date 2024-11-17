@@ -33,6 +33,7 @@ class Bid(models.Model):
 
     # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')  # Гражданин
     username = models.CharField(max_length=20, null=True)
+    chat_id = models.BigIntegerField(null=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     coordinates = models.TextField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='trash_cans/', default="trash_project/media/trash_cans/133500.jpg")

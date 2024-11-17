@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from ..models import Bid, Worker, User
 from django.http import HttpResponse
-from ..utils import model_to_json
+from ..signals import notify_user
 
 """ Заявки """
 @login_required
@@ -15,7 +15,15 @@ def create_bid(request):
         if form.is_valid():
             bid = form.save(commit=False)
             bid.save()
-            return redirect('bid_list')
+            return JsonResponse({
+                'id': bid.id,
+                'type': bid.type,
+                'coordinates': bid.coordinates,
+                'description': bid.description,
+                'status': bid.status,
+                'created_at': bid.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }, status=201)
+            # return redirect('bid_list')
     else:
         form = BidForm()
     return render(request, 'create_bid.html', {'form': form})
@@ -28,8 +36,8 @@ def bid_list(request):
         'id', 'type', 'coordinates', 'description', 'status',
         'assigned_worker__user__username', 'created_at'
     )
-
-    return HttpResponse(bids)
+    return JsonResponse(list(bids), safe=False)
+    # return HttpResponse(bids)
     # if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
     #     return JsonResponse(list(bids), safe=False)
 
@@ -38,7 +46,16 @@ def bid_list(request):
 @login_required
 def bid_detail(request, bid_id):
     bid = get_object_or_404(Bid, id=bid_id)
-    return HttpResponse(bid)
+    return JsonResponse({
+        'id': bid.id,
+        'type': bid.type,
+        'coordinates': bid.coordinates,
+        'description': bid.description,
+        'status': bid.status,
+        'assigned_worker': bid.assigned_worker.user.username if bid.assigned_worker else None,
+        'created_at': bid.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+    })
+    # return HttpResponse(bid)
 
     # return render(request, 'bid_detail.html', {'bid': bid})
 
@@ -48,7 +65,12 @@ def update_bid(request, bid_id):
     if request.method == 'POST':
         form = BidForm(request.POST, request.FILES, instance=bid)
         if form.is_valid():
-            form.save()
+            bid = form.save()
+            if bid.status == 'completed':
+                notify_user(bid)
+
+            bid.save()
+
             return HttpResponse(form)
             # return redirect('bid_list')
     else:
@@ -83,7 +105,7 @@ def create_worker_view(request):
                 # Create a Worker profile
                 Worker.objects.create(user=user)
                 messages.success(request, f"Worker profile created for {user.username}.")
-                return redirect('worker_list')  # Redirect to a worker list page or dashboard
+                return HttpResponse(get_object_or_404(Worker, user=user))
     else:
         form = WorkerCreationForm()
 
@@ -92,13 +114,15 @@ def create_worker_view(request):
 @login_required
 def worker_list(request):
     workers = Worker.objects.all()
-    return render(request, 'worker_list.html', {'workers': workers})
+    return HttpResponse(workers)
+    # return render(request, 'worker_list.html', {'workers': workers})
 
 @login_required
 def worker_bids(request, worker_id):
     worker = get_object_or_404(Worker, id=worker_id)
     bids = Bid.objects.filter(assigned_worker=worker)
-    return render(request, 'worker_bids.html', {'worker': worker, 'bids': bids})
+    return HttpResponse(bids)
+    # return render(request, 'worker_bids.html', {'worker': worker, 'bids': bids})
 
 from django.utils.timezone import now
 @login_required
@@ -127,6 +151,6 @@ def assign_bid_to_worker(request, bid_id, worker_id):
             bid.status = 'in_progress'  # Меняем статус заявки на "В процессе"
             bid.save()  # Сохраняем изменения
 
-            return bid
+            return HttpResponse(bid)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
