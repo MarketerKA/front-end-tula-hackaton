@@ -20,7 +20,6 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = '/login/'
-TELEGRAM_BOT_TOKEN = '7694280802:AAG9qOO8uoYwYlpuDHZ0x89ZEnLn7fMIAik'
 
 
 # Quick-start development settings - unsuitable for production

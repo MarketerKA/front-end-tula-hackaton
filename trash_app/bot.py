@@ -1,101 +1,68 @@
 import os
-import django
-from telegram import Update, Bot, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ConversationHandler
+from telegram import Bot, Update, ReplyKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from django.core.wsgi import get_wsgi_application
 
-# Подключение Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
-django.setup()
+# Django интеграция
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'trash_app.settings')  # Замените на ваше имя проекта
+# application = get_wsgi_application()
 
-from models import Bid, User
+from models import Bid  # Импортируйте вашу модель Bid
+from django.contrib.auth.models import User
 
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+# Загрузите токен из .env или переменной окружения
+TELEGRAM_BOT_TOKEN = '7694280802:AAG9qOO8uoYwYlpuDHZ0x89ZEnLn7fMIAik'
 
-# Этапы диалога
-DESCRIPTION, PHOTO, ADDRESS = range(3)
-
-# Начало диалога
+# Команда /start
 def start(update: Update, context: CallbackContext):
     update.message.reply_text(
-        "Добро пожаловать! Опишите проблему, например: 'Переполненный контейнер'."
+        "Привет! Я помогу вам оформить заявку на устранение свалки. "
+        "Отправьте фотографию и опишите проблему."
     )
-    return DESCRIPTION
 
-# Шаг 1: Получение описания проблемы
-def handle_description(update: Update, context: CallbackContext):
-    context.user_data['description'] = update.message.text
-    update.message.reply_text(
-        "Отлично! Теперь отправьте фото проблемы."
-    )
-    return PHOTO
-
-# Шаг 2: Получение фото
+# Обработка фото
 def handle_photo(update: Update, context: CallbackContext):
-    photo = update.message.photo[-1]  # Выбираем фото с наибольшим разрешением
-    file = context.bot.get_file(photo.file_id)
-    file_path = f"media/trash_cans/{photo.file_id}.jpg"
+    user = update.message.chat
+    photo = update.message.photo[-1]  # Берем фото наивысшего качества
+    file_id = photo.file_id
+    caption = update.message.caption or "Без описания"
+
+    # Скачиваем фото
+    file = context.bot.get_file(file_id)
+    file_path = f"media/trash_cans/{file_id}.jpg"
     file.download(file_path)
 
-    context.user_data['photo_path'] = f"trash_cans/{photo.file_id}.jpg"
-
-    update.message.reply_text(
-        "Фото получено! Теперь отправьте адрес, где находится проблема."
-    )
-    return ADDRESS
-
-# Шаг 3: Получение адреса
-def handle_address(update: Update, context: CallbackContext):
-    address = update.message.text
-    context.user_data['address'] = address
-
-    # Сохраняем пользователя в базе данных или получаем существующего
-    user = update.message.from_user
-    telegram_user, created = User.objects.get_or_create(
-        username=user.username,
-        defaults={'role': 'citizen'}
-    )
-
-    # Создаем запись заявки в базе данных
-    Bid.objects.create(
-        user=telegram_user,
-        type='trash',
-        address=context.user_data['address'],
-        image=context.user_data['photo_path'],
-        description=context.user_data['description'],
+    # Сохраняем заявку в базе данных
+    user_instance, created = User.objects.get_or_create(username=f"tg_{user.id}")
+    bid = Bid.objects.create(
+        user=user_instance,
+        type="trash",
+        image=file_path,
+        description=caption,
+        status="pending",
     )
 
     update.message.reply_text(
-        "Спасибо! Ваша заявка зарегистрирована. Мы свяжемся с вами после ее обработки.",
-        reply_markup=ReplyKeyboardRemove()
+        f"Спасибо! Ваша заявка #{bid.id} принята. Мы скоро свяжемся с вами."
     )
-    return ConversationHandler.END
 
-# Отмена диалога
-def cancel(update: Update, context: CallbackContext):
-    update.message.reply_text(
-        "Вы отменили отправку заявки. Если хотите начать заново, используйте /start.",
-        reply_markup=ReplyKeyboardRemove()
-    )
-    return ConversationHandler.END
+# Обработка текстовых сообщений
+def handle_text(update: Update, context: CallbackContext):
+    update.message.reply_text("Пожалуйста, отправьте фотографию для оформления заявки.")
 
-# Настройка обработчиков
+# Основной блок
 def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater(token=TELEGRAM_BOT_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
 
-    # Определяем диалог
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            DESCRIPTION: [MessageHandler(Filters.text & ~Filters.command, handle_description)],
-            PHOTO: [MessageHandler(Filters.photo, handle_photo)],
-            ADDRESS: [MessageHandler(Filters.text & ~Filters.command, handle_address)],
-        },
-        fallbacks=[CommandHandler('cancel', cancel)],
-    )
+    # Команды
+    dispatcher.add_handler(CommandHandler("start", start))
 
-    dispatcher.add_handler(conv_handler)
+    # Обработчики сообщений
+    dispatcher.add_handler(MessageHandler(filters.photo, handle_photo))
+    dispatcher.add_handler(MessageHandler(filters.text & ~filters.command, handle_text))
 
+    # Запуск бота
     updater.start_polling()
     updater.idle()
 

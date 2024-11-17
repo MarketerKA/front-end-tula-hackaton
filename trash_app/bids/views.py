@@ -4,6 +4,8 @@ from .forms import BidForm, WorkerCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from ..models import Bid, Worker, User
+from django.http import HttpResponse
+from ..utils import model_to_json
 
 """ Заявки """
 @login_required
@@ -18,15 +20,27 @@ def create_bid(request):
         form = BidForm()
     return render(request, 'create_bid.html', {'form': form})
 
+
+from django.core.serializers import serialize
 @login_required
 def bid_list(request):
-    bids = Bid.objects.all()
-    return render(request, 'bid_list.html', {'bids': bids})
+    bids = Bid.objects.all().values(
+        'id', 'type', 'coordinates', 'description', 'status',
+        'assigned_worker__user__username', 'created_at'
+    )
+
+    return HttpResponse(bids)
+    # if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
+    #     return JsonResponse(list(bids), safe=False)
+
+    # return render(request, 'bid_list.html', {'bids': bids})
 
 @login_required
 def bid_detail(request, bid_id):
     bid = get_object_or_404(Bid, id=bid_id)
-    return render(request, 'bid_detail.html', {'bid': bid})
+    return HttpResponse(bid)
+
+    # return render(request, 'bid_detail.html', {'bid': bid})
 
 @login_required
 def update_bid(request, bid_id):
@@ -35,9 +49,11 @@ def update_bid(request, bid_id):
         form = BidForm(request.POST, request.FILES, instance=bid)
         if form.is_valid():
             form.save()
-            return redirect('bid_list')
+            return HttpResponse(form)
+            # return redirect('bid_list')
     else:
         form = BidForm(instance=bid)
+
     return render(request, 'update_bid.html', {'form': form, 'bid': bid})
 
 
@@ -46,7 +62,8 @@ def delete_bid(request, bid_id):
     bid = get_object_or_404(Bid, id=bid_id)
     if request.method == 'POST':
         bid.delete()
-        return redirect('bid_list')
+        return HttpResponse({'message': f"Successfully deleted bid, {bid_id}"})
+        # return redirect('bid_list')
     return render(request, 'delete_bid.html', {'bid': bid})
 
 

@@ -15,7 +15,7 @@ class Worker(models.Model):
     location_image_after = models.CharField(max_length=255, blank=True, null=True)  # Координаты
 
     def __str__(self):
-        return self.user.username
+        return f"{self.__dict__}"
 
 
 class Bid(models.Model):
@@ -34,7 +34,7 @@ class Bid(models.Model):
     # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')  # Гражданин
     username = models.CharField(max_length=20, null=True)
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    address = models.TextField(max_length=255, blank=True, null=True)
+    coordinates = models.TextField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='trash_cans/', default="trash_project/media/trash_cans/133500.jpg")
     description = models.TextField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
@@ -42,7 +42,15 @@ class Bid(models.Model):
     assigned_worker = models.ForeignKey(Worker, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_bids')  # Привязка заявки к сотруднику
 
     def __str__(self):
-        return f"{self.type} - {self.status}"
+        import locale
+
+        # Set the locale to Russian
+        locale.setlocale(locale.LC_TIME, 'ru_RU.UTF-8')  # Make sure this locale is installed on your system
+        data = {
+            **self.__dict__,
+            'created_at': self.created_at.strftime('%d %B, %H:%M') if self.created_at else None,
+        }
+        return f"{data}"
 
 
 from django.db import models
@@ -55,8 +63,19 @@ class Analytics(models.Model):
     average_completion_time = models.DurationField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.__dict__}"
 
 
+class Notifications(models.Model):
+    choices = [
+        ('check_by_human', 'Требуется ручная проверка'),
+        ('check_by_ai', 'Обработаны ИИ'),
+        ('no_trash_cans', 'На фото нет баков')
+    ]
+
+    user = models.OneToOneField(Bid, on_delete=models.CASCADE, related_name='notifications')
+    message = models.CharField(max_length=100, choices=choices)
 
 # class Worker(models.Model):
 #     STATUS_CHOICES = [

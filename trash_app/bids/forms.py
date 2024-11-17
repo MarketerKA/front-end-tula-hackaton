@@ -4,7 +4,7 @@ from ..models import Bid, Worker, User
 class BidForm(forms.ModelForm):
     class Meta:
         model = Bid
-        fields = ['type', 'address', 'image', 'description', 'status', 'assigned_worker']
+        fields = ['type', 'coordinates', 'image', 'description', 'status', 'assigned_worker']
 
 
 
