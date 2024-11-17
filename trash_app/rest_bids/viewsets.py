@@ -40,3 +40,21 @@ class BidViewSet(viewsets.ModelViewSet):
             'message': f"Bid {bid.id} marked as completed.",
             'bid': BidSerializer(bid).data
         }, status=status.HTTP_200_OK)
+
+
+from rest_framework.views import APIView
+class WorkerBidsView(APIView):
+    def get(self, request, worker_id):
+        try:
+            # Get the worker
+            worker = Worker.objects.get(id=worker_id)
+
+            # Get all bids assigned to this worker
+            bids = Bid.objects.filter(assigned_worker=worker)
+
+            # Serialize the data
+            serializer = BidSerializer(bids, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Worker.DoesNotExist:
+            return Response({'error': 'Worker not found'}, status=status.HTTP_404_NOT_FOUND)
