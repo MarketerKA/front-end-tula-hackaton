@@ -18,6 +18,7 @@ django.setup()
 load_dotenv(".env")
 
 from trash_app.models import Bid
+from trash_app.image_classifier import predict_image, CLASSES
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
@@ -62,7 +63,13 @@ async def save_bid(update: Update, context: ContextTypes.DEFAULT_TYPE):
     address = update.message.text
     context.user_data['address'] = address
 
-    # Save the bid to the database
+    if predict_image(context.user_data['image']) in CLASSES:
+        await update.message.reply_text(
+            f"Подождите Искусственный интеллект проверяет вашу фотографию",
+            reply_markup=ReplyKeyboardRemove()
+        )
+        pass
+
     await sync_to_async(Bid.objects.create)(
         username=update.effective_user.username,
         chat_id=update.message.chat_id,
@@ -77,6 +84,7 @@ async def save_bid(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Спасибо! Ваша заявка принята.\nОписание: {context.user_data['description']}\nАдрес: {context.user_data['address']}",
         reply_markup=ReplyKeyboardRemove()
     )
+
 
     # Clear user data after submission
     context.user_data.clear()

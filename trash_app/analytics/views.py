@@ -42,7 +42,7 @@ def time_analysis_view(request):
 
 @api_view(['GET'])
 def location_analysis_view(request):
-    hotspots = Bid.objects.values('address').annotate(total=Count('id')).order_by('-total')[:10]
+    hotspots = Bid.objects.values('coordinates').annotate(total=Count('id')).order_by('-total')[:10]
     return Response(hotspots)
 
 @api_view(['GET'])
