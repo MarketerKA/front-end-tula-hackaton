@@ -1,0 +1,110 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #e5e5e5;
+
+  .logo {
+    font-size: 25px;
+    font-weight: bold;
+    color: #343c6a;
+  }
+
+  .menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 54px;
+
+    .menuItem {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      color: #b1b1b1;
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: inherit;
+        text-decoration: none;
+    
+        &:hover {
+          color: #2d60ff;
+    
+          .icon svg path {
+            fill: #2d60ff;
+          }
+        }
+    
+        &.active {
+          color: #2d60ff;
+    
+          .icon svg path {
+            fill: #2d60ff;
+          }
+        }
+      }
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+
+      .profileIcon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  // Адаптация под мобильные устройства
+  @media (max-width: 768px) {
+    flex-direction: column; // Перенос элементов в столбик
+    align-items: flex-start; // Выравнивание по левому краю
+    padding: 10px;
+
+    .logo {
+      font-size: 20px; // Уменьшение размера текста
+    }
+
+    .menu {
+      width: 100%;
+      flex-direction: column; // Размещение меню в столбик
+      gap: 20px; // Уменьшение расстояния между пунктами
+
+      .menuItem {
+        justify-content: flex-start; // Выравнивание пунктов меню по левому краю
+        gap: 10px;
+
+        .icon {
+          width: 20px; // Уменьшение размера иконок
+          height: 20px;
+        }
+      }
+
+      .profile {
+        align-self: flex-end; // Профиль справа
+        margin-top: 10px;
+
+        .profileIcon {
+          width: 28px; // Уменьшение размера иконки профиля
+          height: 28px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logo {
+      font-size: 18px; // Еще меньше текста на маленьких экранах
+    }
+
+    .menuItem {
+      font-size: 14px; // Уменьшение текста меню
+    }
+  }
+}

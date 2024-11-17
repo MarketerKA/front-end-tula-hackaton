@@ -1,0 +1,135 @@
+.requestDetails {
+  border: 1px dashed #d6d6d6;
+  margin-top: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  border-radius: 25px;
+  background: #FFF;
+  margin-left: 30px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2d60ff;
+    margin-bottom: 20px;
+  }
+
+  .detailsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+
+    .details {
+      flex: 2;
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: #343c6a;
+
+        strong {
+          display: block;
+          font-weight: bold;
+          color: #2d60ff;
+        }
+      }
+    }
+
+    .photos {
+      flex-shrink: 0;
+      max-width: 150px;
+      text-align: right;
+
+      img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .description {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #718ebf;
+  }
+
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-start; /* Выравнивание кнопок влево */
+    gap: 10px; /* Расстояние между кнопками */
+
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      border: 1px solid #e5e5e5;
+      border-radius: 25px;
+      background: #fff;
+      color: #123288;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: #f0f0f0;
+      }
+
+      &:first-of-type {
+        border-color: #16dbab;
+        color: #16dbab;
+      }
+
+      &:last-of-type {
+        border-color: #123288;
+        color: #123288;
+      }
+    }
+  }
+
+  .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+
+    &.inProgress {
+      background-color: #ffecb3;
+      color: #ff9800;
+    }
+
+    &.completed {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    &.rejected {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+  }
+}
+.columnName {
+  color: #718EBF;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.columnValue {
+  color: #232323;
+  margin-top: 10px;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
