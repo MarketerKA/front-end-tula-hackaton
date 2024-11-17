@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/front-end-tula-hackaton/static/css/main.8d53243b.css",
+    "main.js": "/front-end-tula-hackaton/static/js/main.61f83ab4.js",
+    "static/js/453.5d7160a0.chunk.js": "/front-end-tula-hackaton/static/js/453.5d7160a0.chunk.js",
+    "static/media/photo_2024-11-17_08-05-41.jpg": "/front-end-tula-hackaton/static/media/photo_2024-11-17_08-05-41.aac088767f0c08c9f59c.jpg",
+    "static/media/photo_2024-11-17_05-14-09.jpg": "/front-end-tula-hackaton/static/media/photo_2024-11-17_05-14-09.750a6a9a7fdca71641a5.jpg",
+    "static/media/photo_2024-11-17_05-59-17.jpg": "/front-end-tula-hackaton/static/media/photo_2024-11-17_05-59-17.f70c79b64a7f966fdcd0.jpg",
+    "static/media/photo_2024-11-17_08-14-40.jpg": "/front-end-tula-hackaton/static/media/photo_2024-11-17_08-14-40.f347412bb323f3e1e696.jpg",
+    "static/media/photo_2024-11-17_05-14-27.jpg": "/front-end-tula-hackaton/static/media/photo_2024-11-17_05-14-27.98c0514b1d31125838ac.jpg",
+    "index.html": "/front-end-tula-hackaton/index.html",
+    "static/media/profileIcon.svg": "/front-end-tula-hackaton/static/media/profileIcon.7e46c65538fac62e904edf133bd4004a.svg",
+    "main.8d53243b.css.map": "/front-end-tula-hackaton/static/css/main.8d53243b.css.map",
+    "main.61f83ab4.js.map": "/front-end-tula-hackaton/static/js/main.61f83ab4.js.map",
+    "453.5d7160a0.chunk.js.map": "/front-end-tula-hackaton/static/js/453.5d7160a0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.8d53243b.css",
+    "static/js/main.61f83ab4.js"
+  ]
+}
